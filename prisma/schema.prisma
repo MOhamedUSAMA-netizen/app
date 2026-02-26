@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("STUDENT") // "TEACHER" or "STUDENT"
+  createdAt DateTime @default(now())
+
+  accesses    StudentAccess[]
+  submissions Submission[]
+  engagements VideoEngagement[]
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  videoUrl    String?
+  videoName   String?
+  pdfUrl      String?
+  pdfName     String?
+
+  quiz        Quiz?
+  accesses    StudentAccess[]
+}
+
+model Quiz {
+  id        String   @id @default(cuid())
+  title     String
+  sessionId String   @unique
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  questions Question[]
+  submissions Submission[]
+}
+
+model Question {
+  id            String @id @default(cuid())
+  quizId        String
+  quiz          Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  text          String
+  options       String // Store as JSON string
+  correctAnswer Int    // Index of correct option
+}
+
+model StudentAccess {
+  id        String   @id @default(cuid())
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  isLocked  Boolean  @default(true)
+  expiresAt DateTime?
+
+  @@unique([studentId, sessionId])
+}
+
+model Submission {
+  id        String   @id @default(cuid())
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  quizId    String
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  score     Int
+  total     Int
+  createdAt DateTime @default(now())
+}
+
+model VideoEngagement {
+  id        String   @id @default(cuid())
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  sessionId String
+  watched   Int      @default(0) // Seconds or percentage
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, sessionId])
+}
