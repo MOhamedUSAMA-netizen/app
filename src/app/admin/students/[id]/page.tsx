@@ -21,7 +21,7 @@ async function toggleAccess(studentId: string, sessionId: string, currentlyLocke
   revalidatePath(`/admin/students/${studentId}`);
 }
 
-export default async function StudentDetailPage({ params }: { params: { id: string } }) {
+export default async function StudentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const student = await prisma.user.findUnique({
     where: { id },

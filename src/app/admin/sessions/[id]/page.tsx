@@ -1,17 +1,22 @@
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
-import { Video, FileText, HelpCircle, ArrowRight, Save } from 'lucide-react';
+import { Video, FileText, HelpCircle, ArrowRight, Save, Key } from 'lucide-react';
 import Link from 'next/link';
 import QuizBuilder from '@/components/QuizBuilder';
+import AccessCodeManager from '@/components/AccessCodeManager';
 import { updateSessionContentAction } from '@/lib/actions';
 
-export default async function SessionDetailPage({ params }: { params: { id: string } }) {
+export default async function SessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await prisma.session.findUnique({
     where: { id },
     include: {
       quiz: {
         include: { questions: true }
+      },
+      accessCodes: {
+        include: { usedBy: true },
+        orderBy: { createdAt: 'desc' }
       }
     }
   });
@@ -103,6 +108,15 @@ export default async function SessionDetailPage({ params }: { params: { id: stri
             </h3>
 
             <QuizBuilder sessionId={id} initialQuiz={session.quiz} />
+          </div>
+
+          <div className="bg-zinc-900 p-6 rounded-xl border border-zinc-800">
+            <h3 className="text-xl font-semibold mb-6 flex items-center">
+              <Key className="ml-2 h-5 w-5 text-yellow-500" />
+              أكواد الوصول (Access Codes)
+            </h3>
+
+            <AccessCodeManager sessionId={id} initialCodes={session.accessCodes} />
           </div>
         </div>
       </div>

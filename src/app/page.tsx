@@ -2,8 +2,9 @@ import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Lock, Unlock, PlayCircle, FileText, GraduationCap, ChevronLeft, LogOut } from 'lucide-react';
+import { Lock, Unlock, PlayCircle, FileText, GraduationCap, ChevronLeft, LogOut, Clock } from 'lucide-react';
 import { logoutAction } from '@/lib/actions';
+import RedeemCodeForm from '@/components/RedeemCodeForm';
 
 export default async function StudentHome() {
   const session = await getSession();
@@ -47,10 +48,16 @@ export default async function StudentHome() {
         </form>
       </header>
 
+      <RedeemCodeForm studentId={studentId} />
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {sessions.map((item, index) => {
           const access = item.accesses[0];
-          const isLocked = access ? access.isLocked : true; // Default to locked
+          // Check for expiration
+          let isLocked = access ? access.isLocked : true;
+          if (access?.expiresAt && new Date() > access.expiresAt) {
+            isLocked = true;
+          }
           const isCompleted = (item.quiz?.submissions?.length ?? 0) > 0;
 
           return (
@@ -79,6 +86,12 @@ export default async function StudentHome() {
                 </div>
 
                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                {access?.expiresAt && !isLocked && (
+                  <div className="flex items-center gap-1 text-[10px] text-yellow-500 mb-2 font-bold">
+                    <Clock className="h-3 w-3" />
+                    <span>ينتهي في: {access.expiresAt.toLocaleString('ar-EG')}</span>
+                  </div>
+                )}
                 <p className="text-zinc-500 text-sm mb-6 line-clamp-2">{item.description}</p>
 
                 <div className="flex items-center gap-4 mb-8 text-zinc-400">

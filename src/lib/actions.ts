@@ -4,6 +4,7 @@ import { prisma } from './prisma';
 import bcrypt from 'bcryptjs';
 import { login, logout } from './auth';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 
 export async function loginAction(email: string, password: string) {
   const user = await prisma.user.findUnique({
@@ -148,4 +149,82 @@ export async function trackEngagementAction(sessionId: string, studentId: string
       watched: seconds,
     },
   });
+}
+
+export async function generateAccessCodesAction(sessionId: string, count: number, durationHrs: number) {
+  const session = await prisma.session.findUnique({ where: { id: sessionId } });
+  if (!session) return { error: 'Session not found' };
+
+  const codes = [];
+  for (let i = 0; i < count; i++) {
+    const randomPart = Math.random().toString(36).substring(2, 5).toUpperCase();
+    const randomPart2 = Math.random().toString(36).substring(2, 4).toUpperCase();
+    const code = `HIST-${randomPart}-${randomPart2}-${Math.floor(Math.random() * 100)}`;
+    codes.push({
+      code,
+      sessionId,
+      durationHrs,
+    });
+  }
+
+  await prisma.accessCode.createMany({
+    data: codes,
+  });
+
+  revalidatePath(`/admin/sessions/${sessionId}`);
+}
+
+export async function deleteAccessCodeAction(codeId: string, sessionId: string) {
+  await prisma.accessCode.delete({ where: { id: codeId } });
+  revalidatePath(`/admin/sessions/${sessionId}`);
+}
+
+export async function redeemCodeAction(studentId: string, code: string) {
+  const accessCode = await prisma.accessCode.findUnique({
+    where: { code },
+    include: { session: true }
+  });
+
+  if (!accessCode) {
+    return { error: 'كود غير صحيح' };
+  }
+
+  if (accessCode.isUsed) {
+    return { error: 'تم استخدام هذا الكود من قبل' };
+  }
+
+  const expiresAt = new Date(Date.now() + accessCode.durationHrs * 60 * 60 * 1000);
+
+  // Update code status
+  await prisma.accessCode.update({
+    where: { id: accessCode.id },
+    data: {
+      isUsed: true,
+      usedById: studentId,
+      usedAt: new Date(),
+    }
+  });
+
+  // Grant access
+  await prisma.studentAccess.upsert({
+    where: {
+      studentId_sessionId: {
+        studentId,
+        sessionId: accessCode.sessionId
+      }
+    },
+    update: {
+      isLocked: false,
+      expiresAt: expiresAt,
+    },
+    create: {
+      studentId,
+      sessionId: accessCode.sessionId,
+      isLocked: false,
+      expiresAt: expiresAt,
+    }
+  });
+
+  revalidatePath('/');
+  return { success: true };
 }

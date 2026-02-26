@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, Play, FileText, GraduationCap } from 'lucide-react';
 import EngagementTracker from '@/components/EngagementTracker';
 
-export default async function StudentSessionDetail({ params }: { params: { id: string } }) {
+export default async function StudentSessionDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await getSession();
 
@@ -31,7 +31,10 @@ export default async function StudentSessionDetail({ params }: { params: { id: s
   if (!item) notFound();
 
   const access = item.accesses[0];
-  const isLocked = access ? access.isLocked : true;
+  let isLocked = access ? access.isLocked : true;
+  if (access?.expiresAt && new Date() > access.expiresAt) {
+    isLocked = true;
+  }
 
   if (isLocked) {
     redirect('/');

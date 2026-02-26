@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { notFound, redirect } from 'next/navigation';
 import QuizPlayer from '@/components/QuizPlayer';
 
-export default async function StudentQuizPage({ params }: { params: { id: string } }) {
+export default async function StudentQuizPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await getSession();
 
@@ -30,7 +30,10 @@ export default async function StudentQuizPage({ params }: { params: { id: string
   if (!item || !item.quiz) notFound();
 
   const access = item.accesses[0];
-  const isLocked = access ? access.isLocked : true;
+  let isLocked = access ? access.isLocked : true;
+  if (access?.expiresAt && new Date() > access.expiresAt) {
+    isLocked = true;
+  }
 
   if (isLocked || item.quiz.submissions.length > 0) {
     redirect(`/sessions/${id}`);

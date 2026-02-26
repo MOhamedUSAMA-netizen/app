@@ -9,11 +9,11 @@ export default function EngagementTracker({ sessionId, studentId }: { sessionId:
   useEffect(() => {
     lastTracked.current = Date.now();
 
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       const now = Date.now();
       // Track every 30 seconds
       if (now - lastTracked.current >= 30000) {
-        trackEngagementAction(sessionId, studentId, 30);
+        await trackEngagementAction(sessionId, studentId, 30);
         lastTracked.current = now;
       }
     }, 10000);
