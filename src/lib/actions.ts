@@ -105,18 +105,23 @@ export async function updateSessionContentAction(id: string, formData: FormData)
   let videoUrl = formData.get('videoUrl') as string;
   let pdfUrl = formData.get('pdfUrl') as string;
 
+  const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
   if (videoFile && videoFile.size > 0) {
     const buffer = Buffer.from(await videoFile.arrayBuffer());
-    const fileName = `${id}_${Date.now()}_${videoFile.name}`;
-    const filePath = path.join(process.cwd(), 'public/uploads', fileName);
+    const fileName = `${id}_${Date.now()}_${videoFile.name.replace(/\s+/g, '_')}`;
+    const filePath = path.join(uploadDir, fileName);
     fs.writeFileSync(filePath, buffer);
     videoUrl = `/uploads/${fileName}`;
   }
 
   if (pdfFile && pdfFile.size > 0) {
     const buffer = Buffer.from(await pdfFile.arrayBuffer());
-    const fileName = `${id}_${Date.now()}_${pdfFile.name}`;
-    const filePath = path.join(process.cwd(), 'public/uploads', fileName);
+    const fileName = `${id}_${Date.now()}_${pdfFile.name.replace(/\s+/g, '_')}`;
+    const filePath = path.join(uploadDir, fileName);
     fs.writeFileSync(filePath, buffer);
     pdfUrl = `/uploads/${fileName}`;
   }

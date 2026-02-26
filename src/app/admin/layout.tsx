@@ -20,7 +20,10 @@ export default async function AdminLayout({
       {/* Sidebar */}
       <aside className="w-64 bg-zinc-900 border-l border-zinc-800 hidden md:block">
         <div className="p-6">
-          <h1 className="text-xl font-bold text-blue-500">لوحة المعلم</h1>
+          <h1 className="text-xl font-bold text-blue-500 flex items-center gap-2">
+            لوحة المعلم
+            <span className="text-[10px] bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded-full">ADMIN</span>
+          </h1>
         </div>
         <nav className="mt-6">
           <Link href="/admin" className="flex items-center px-6 py-3 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">

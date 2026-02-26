@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
-import { Users, BookOpen, GraduationCap, PlayCircle } from 'lucide-react';
+import { Users, BookOpen, GraduationCap, PlayCircle, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 export default async function AdminDashboard() {
   const studentCount = await prisma.user.count({ where: { role: 'STUDENT' } });
@@ -22,6 +23,26 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <div className="bg-zinc-900 p-6 rounded-xl border border-zinc-800">
+          <h3 className="text-xl font-bold mb-4">المحاضرات (إدارة الأكواد)</h3>
+          <div className="space-y-3">
+             {/* Shortcut to session codes */}
+             {await prisma.session.findMany({ take: 5, orderBy: { createdAt: 'desc' } }).then(sessions => sessions.map(s => (
+                <Link
+                  key={s.id}
+                  href={`/admin/sessions/${s.id}`}
+                  className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg hover:bg-zinc-800 transition-colors"
+                >
+                   <span className="font-medium">{s.title}</span>
+                   <span className="text-xs text-yellow-500 font-bold flex items-center gap-1">
+                      إدارة الأكواد
+                      <ArrowRight className="h-3 w-3 -rotate-180" />
+                   </span>
+                </Link>
+             )))}
+          </div>
+        </div>
+
         <div className="bg-zinc-900 p-6 rounded-xl border border-zinc-800">
           <h3 className="text-xl font-bold mb-4">أحدث الطلاب المسجلين</h3>
           <div className="space-y-4">
