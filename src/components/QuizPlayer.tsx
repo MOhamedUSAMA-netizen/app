@@ -50,7 +50,7 @@ export default function QuizPlayer({ quiz, studentId, sessionId }: { quiz: any, 
         }
       });
 
-      await submitQuizAction(quiz.id, studentId, score, questions.length);
+      await submitQuizAction(quiz.id, studentId, score, questions.length, answers);
       setSubmitted(true);
       setTimeout(() => {
         router.push(`/sessions/${sessionId}`);

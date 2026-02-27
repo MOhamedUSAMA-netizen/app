@@ -29,7 +29,10 @@ async function deleteSession(id: string) {
 export default async function SessionsPage() {
   const sessions = await prisma.session.findMany({
     orderBy: { createdAt: 'desc' },
-    include: { quiz: true },
+    include: {
+      quiz: true,
+      media: true,
+    },
   });
 
   return (
@@ -70,10 +73,10 @@ export default async function SessionsPage() {
               <p className="text-zinc-400 text-sm mb-4 line-clamp-2">{session.description || 'لا يوجد وصف'}</p>
 
               <div className="flex items-center gap-4 mb-6">
-                <div className={`p-2 rounded-lg ${session.videoUrl ? 'bg-blue-500/20 text-blue-500' : 'bg-zinc-800 text-zinc-500'}`}>
+                <div className={`p-2 rounded-lg ${session.media.some(m => m.type === 'VIDEO') ? 'bg-blue-500/20 text-blue-500' : 'bg-zinc-800 text-zinc-500'}`}>
                   <Video className="h-5 w-5" />
                 </div>
-                <div className={`p-2 rounded-lg ${session.pdfUrl ? 'bg-red-500/20 text-red-500' : 'bg-zinc-800 text-zinc-500'}`}>
+                <div className={`p-2 rounded-lg ${session.media.some(m => m.type === 'PDF') ? 'bg-red-500/20 text-red-500' : 'bg-zinc-800 text-zinc-500'}`}>
                   <FileText className="h-5 w-5" />
                 </div>
                 <div className={`p-2 rounded-lg ${session.quiz ? 'bg-green-500/20 text-green-500' : 'bg-zinc-800 text-zinc-500'}`}>

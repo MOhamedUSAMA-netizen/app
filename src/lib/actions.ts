@@ -82,13 +82,14 @@ export async function saveQuizAction(sessionId: string, questions: any[]) {
   });
 }
 
-export async function submitQuizAction(quizId: string, studentId: string, score: number, total: number) {
+export async function submitQuizAction(quizId: string, studentId: string, score: number, total: number, answers: number[]) {
   await prisma.submission.create({
     data: {
       quizId,
       studentId,
       score,
       total,
+      answers: JSON.stringify(answers),
     },
   });
 }
@@ -96,48 +97,51 @@ export async function submitQuizAction(quizId: string, studentId: string, score:
 import fs from 'fs';
 import path from 'path';
 
-export async function updateSessionContentAction(id: string, formData: FormData) {
-  const videoFile = formData.get('videoFile') as File;
-  const pdfFile = formData.get('pdfFile') as File;
-  const videoName = formData.get('videoName') as string;
-  const pdfName = formData.get('pdfName') as string;
-
-  let videoUrl = formData.get('videoUrl') as string;
-  let pdfUrl = formData.get('pdfUrl') as string;
+export async function addMediaAction(sessionId: string, formData: FormData) {
+  const file = formData.get('file') as File;
+  const name = formData.get('name') as string;
+  const type = formData.get('type') as string; // VIDEO or PDF
+  let url = formData.get('url') as string;
 
   const uploadDir = path.join(process.cwd(), 'public', 'uploads');
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
 
-  if (videoFile && videoFile.size > 0) {
-    const buffer = Buffer.from(await videoFile.arrayBuffer());
-    const fileName = `${id}_${Date.now()}_${videoFile.name.replace(/\s+/g, '_')}`;
+  if (file && file.size > 0) {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const fileName = `${sessionId}_${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
     const filePath = path.join(uploadDir, fileName);
     fs.writeFileSync(filePath, buffer);
-    videoUrl = `/uploads/${fileName}`;
+    url = `/uploads/${fileName}`;
   }
 
-  if (pdfFile && pdfFile.size > 0) {
-    const buffer = Buffer.from(await pdfFile.arrayBuffer());
-    const fileName = `${id}_${Date.now()}_${pdfFile.name.replace(/\s+/g, '_')}`;
-    const filePath = path.join(uploadDir, fileName);
-    fs.writeFileSync(filePath, buffer);
-    pdfUrl = `/uploads/${fileName}`;
-  }
+  if (!url) return { error: 'يرجى اختيار ملف أو إدخال رابط' };
 
-  await prisma.session.update({
-    where: { id },
+  await prisma.media.create({
     data: {
-      videoUrl,
-      videoName: videoName || videoFile?.name,
-      pdfUrl,
-      pdfName: pdfName || pdfFile?.name,
+      sessionId,
+      type,
+      name: name || file?.name || 'مرفق جديد',
+      url,
+      order: 0,
     },
   });
 
-  revalidatePath(`/admin/sessions/${id}`);
+  revalidatePath(`/admin/sessions/${sessionId}`);
   revalidatePath('/');
+}
+
+export async function deleteMediaAction(mediaId: string, sessionId: string) {
+  const media = await prisma.media.findUnique({ where: { id: mediaId } });
+  if (media && media.url.startsWith('/uploads/')) {
+    const filePath = path.join(process.cwd(), 'public', media.url);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  }
+  await prisma.media.delete({ where: { id: mediaId } });
+  revalidatePath(`/admin/sessions/${sessionId}`);
 }
 
 export async function trackEngagementAction(sessionId: string, studentId: string, seconds: number) {
