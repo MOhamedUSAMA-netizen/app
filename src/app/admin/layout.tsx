@@ -4,6 +4,18 @@ import Link from 'next/link';
 import { LayoutDashboard, Users, BookOpen, LogOut } from 'lucide-react';
 import { logoutAction } from '@/lib/actions';
 
+function AdminNavLink({ href, icon, label }: any) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center px-6 py-4 text-zinc-400 hover:bg-blue-600/10 hover:text-blue-500 rounded-2xl transition-all duration-300 group"
+    >
+      <div className="group-hover:scale-110 transition-transform">{icon}</div>
+      <span className="font-bold">{label}</span>
+    </Link>
+  );
+}
+
 export default async function AdminLayout({
   children,
 }: {
@@ -18,26 +30,17 @@ export default async function AdminLayout({
   return (
     <div className="flex min-h-screen bg-black text-white" dir="rtl">
       {/* Sidebar */}
-      <aside className="w-64 bg-zinc-900 border-l border-zinc-800 hidden md:block">
-        <div className="p-6">
-          <h1 className="text-xl font-bold text-blue-500 flex items-center gap-2">
+      <aside className="w-72 glass border-l border-zinc-800 hidden md:block relative z-50">
+        <div className="p-8">
+          <h1 className="text-2xl font-black text-blue-500 flex items-center gap-3">
             لوحة المعلم
-            <span className="text-[10px] bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded-full">ADMIN</span>
+            <span className="text-[10px] bg-blue-500 text-white px-2 py-0.5 rounded-md">PRO</span>
           </h1>
         </div>
-        <nav className="mt-6">
-          <Link href="/admin" className="flex items-center px-6 py-3 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">
-            <LayoutDashboard className="ml-3 h-5 w-5" />
-            <span>الرئيسية</span>
-          </Link>
-          <Link href="/admin/sessions" className="flex items-center px-6 py-3 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">
-            <BookOpen className="ml-3 h-5 w-5" />
-            <span>المحاضرات</span>
-          </Link>
-          <Link href="/admin/students" className="flex items-center px-6 py-3 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">
-            <Users className="ml-3 h-5 w-5" />
-            <span>الطلاب</span>
-          </Link>
+        <nav className="mt-8 px-4 space-y-2">
+          <AdminNavLink href="/admin" icon={<LayoutDashboard className="ml-3 h-5 w-5" />} label="الرئيسية" />
+          <AdminNavLink href="/admin/sessions" icon={<BookOpen className="ml-3 h-5 w-5" />} label="المحاضرات" />
+          <AdminNavLink href="/admin/students" icon={<Users className="ml-3 h-5 w-5" />} label="الطلاب" />
         </nav>
         <div className="absolute bottom-0 w-64 p-6 border-t border-zinc-800">
           <form action={logoutAction}>

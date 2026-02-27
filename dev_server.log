@@ -8,16 +8,27 @@
    - Environments: .env
 
  ✓ Starting...
- ✓ Ready in 2.9s
+ ✓ Ready in 3.4s
  ○ Compiling /src/middleware ...
- ✓ Compiled /src/middleware in 764ms (171 modules)
+ ✓ Compiled /src/middleware in 641ms (171 modules)
  ○ Compiling /login ...
- ✓ Compiled /login in 4.8s (796 modules)
- GET /login 200 in 5473ms
- POST /login 200 in 258ms
- GET /login 200 in 69ms
- POST /login 200 in 17ms
- GET /login 200 in 31ms
- ○ Compiling /register ...
- ✓ Compiled /register in 739ms (803 modules)
- POST /register 200 in 915ms
+ ✓ Compiled /login in 7.6s (1616 modules)
+ GET /login 200 in 8574ms
+ POST /login 200 in 195ms
+ GET /login 200 in 67ms
+ POST /login 200 in 18ms
+ POST /login 200 in 36ms
+ GET /login 200 in 47ms
+ POST /login 200 in 195ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1676ms (1782 modules)
+ GET / 200 in 1924ms
+ GET / 200 in 30ms
+ GET / 200 in 20ms
+ GET / 200 in 21ms
+ ○ Compiling /admin ...
+ ✓ Compiled /admin in 855ms (1783 modules)
+ GET /admin 200 in 1261ms
+ GET /admin 200 in 75ms
+ ✓ Compiled /admin/sessions in 436ms (1788 modules)
+ GET /admin/sessions 200 in 788ms

@@ -36,15 +36,18 @@ export default async function StudentYearSessionsPage({ params }: { params: Prom
   };
 
   return (
-    <div className="min-h-screen bg-black text-white px-4 py-8 md:px-12" dir="rtl">
-      <header className="flex items-center gap-4 mb-12">
-        <Link href="/" className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
+    <div className="min-h-screen text-white px-4 py-12 md:px-16" dir="rtl">
+      <header className="flex items-center gap-6 mb-16">
+        <Link href="/" className="p-3 glass rounded-2xl hover:bg-blue-600/20 transition-all hover:scale-110">
           <ArrowRight className="h-6 w-6" />
         </Link>
-        <h1 className="text-3xl font-bold">{yearNames[year]}</h1>
+        <div>
+          <h1 className="text-4xl font-extrabold">{yearNames[year]}</h1>
+          <p className="text-zinc-500 mt-2">تصفح المحاضرات المتاحة لك في هذا العام</p>
+        </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
         {sessions.map((item, index) => {
           const access = item.accesses[0];
           let isLocked = access ? access.isLocked : true;
@@ -56,10 +59,10 @@ export default async function StudentYearSessionsPage({ params }: { params: Prom
           return (
             <div
               key={item.id}
-              className={`relative rounded-2xl border transition-all duration-300 ${
+              className={`relative rounded-[2rem] border transition-all duration-500 ${
                 isLocked
-                ? 'bg-zinc-900/50 border-zinc-800 grayscale opacity-80'
-                : 'bg-zinc-900 border-zinc-800 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10'
+                ? 'bg-zinc-900/50 border-zinc-800/50 grayscale opacity-70'
+                : 'glass-card border-zinc-800 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-2'
               }`}
             >
               <div className="p-6">
@@ -88,13 +91,13 @@ export default async function StudentYearSessionsPage({ params }: { params: Prom
                 <p className="text-zinc-500 text-sm mb-6 line-clamp-2">{item.description}</p>
 
                 {isLocked ? (
-                  <button className="w-full py-3 rounded-xl bg-zinc-800 text-zinc-500 font-bold cursor-not-allowed">
-                    مغلق حالياً
+                  <button className="w-full py-4 rounded-2xl bg-zinc-800/50 text-zinc-500 font-bold cursor-not-allowed border border-zinc-800">
+                    المحاضرة مغلقة
                   </button>
                 ) : (
                   <Link
                     href={`/sessions/${item.id}`}
-                    className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold flex items-center justify-center transition-colors group"
+                    className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold flex items-center justify-center transition-all duration-300 group shadow-lg shadow-blue-600/20"
                   >
                     دخول المحاضرة
                     <ChevronLeft className="mr-2 h-5 w-5 group-hover:-translate-x-1 transition-transform" />

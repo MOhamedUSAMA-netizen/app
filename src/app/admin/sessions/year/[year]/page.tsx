@@ -49,15 +49,20 @@ export default async function AdminYearSessionsPage({ params }: { params: Promis
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center gap-4">
-        <Link href="/admin/sessions" className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
-          <ArrowRight className="h-6 w-6" />
-        </Link>
-        <h2 className="text-3xl font-bold">{yearNames[year]}</h2>
+    <div className="space-y-10">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-6">
+          <Link href="/admin/sessions" className="p-3 glass rounded-2xl hover:bg-blue-600/10 transition-all hover:scale-110">
+            <ArrowRight className="h-6 w-6" />
+          </Link>
+          <div>
+            <h2 className="text-4xl font-black">{yearNames[year]}</h2>
+            <p className="text-zinc-500 mt-2">إدارة وتنظيم محاضرات هذا العام الدراسي</p>
+          </div>
+        </div>
       </div>
 
-      <div className="bg-zinc-900 p-6 rounded-xl border border-zinc-800">
+      <div className="glass-card p-8 rounded-[2rem] border-blue-500/20 shadow-2xl shadow-blue-500/5">
         <h3 className="text-xl font-semibold mb-4 text-blue-500">إضافة محاضرة جديدة</h3>
         <form action={createSession.bind(null, year)} className="flex flex-col md:flex-row gap-4">
           <input
@@ -81,11 +86,11 @@ export default async function AdminYearSessionsPage({ params }: { params: Promis
         </form>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {sessions.map((session) => (
-          <div key={session.id} className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden hover:border-zinc-700 transition-all group">
-            <div className="p-6">
-              <h4 className="text-xl font-bold mb-2">{session.title}</h4>
+          <div key={session.id} className="glass-card rounded-[2rem] border-zinc-800 overflow-hidden hover:border-blue-500/50 transition-all duration-500 group">
+            <div className="p-8">
+              <h4 className="text-2xl font-bold mb-3 group-hover:text-blue-400 transition-colors">{session.title}</h4>
               <p className="text-zinc-400 text-sm mb-4 line-clamp-2">{session.description || 'لا يوجد وصف'}</p>
 
               <div className="flex items-center gap-4 mb-6">

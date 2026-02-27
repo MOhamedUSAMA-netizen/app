@@ -1,9 +1,11 @@
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Folder, ChevronLeft, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { logoutAction } from '@/lib/actions';
 import RedeemCodeForm from '@/components/RedeemCodeForm';
+import FolderCard from '@/components/FolderCard';
+import FadeIn from '@/components/FadeIn';
 
 export default async function StudentHome() {
   const session = await getSession();
@@ -25,40 +27,41 @@ export default async function StudentHome() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white px-4 py-6 md:px-12" dir="rtl">
-      <header className="flex justify-between items-center mb-8 md:mb-12">
-        <div>
-          <h1 className="text-3xl font-bold">مرحباً، {session.user.name} 👋</h1>
-          <p className="text-zinc-500 mt-2">اختر السنة الدراسية للوصول إلى المحاضرات</p>
-        </div>
-        <form action={logoutAction}>
-          <button className="p-2 text-zinc-500 hover:text-red-500 transition-colors">
-            <LogOut className="h-6 w-6" />
-          </button>
-        </form>
-      </header>
+    <div className="min-h-screen text-white px-4 py-8 md:px-16" dir="rtl">
+      <FadeIn>
+        <header className="flex justify-between items-center mb-16">
+          <div>
+            <h1 className="text-4xl font-extrabold tracking-tight">مرحباً، {session.user.name} 👋</h1>
+            <p className="text-zinc-500 mt-3 text-lg">مرحباً بك في بوابتك التعليمية لمادة الدراسات الاجتماعية</p>
+          </div>
+          <form action={logoutAction}>
+            <button className="p-3 glass rounded-2xl text-zinc-500 hover:text-red-500 transition-all duration-300 hover:scale-110">
+              <LogOut className="h-6 w-6" />
+            </button>
+          </form>
+        </header>
+      </FadeIn>
 
-      <RedeemCodeForm studentId={studentId} />
+      <FadeIn delay={0.2}>
+        <RedeemCodeForm studentId={studentId} />
+      </FadeIn>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {years.map((year) => (
-          <Link
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-12">
+        {years.map((year, idx) => (
+          <FolderCard
             key={year.id}
+            id={year.id}
+            name={year.name}
+            desc={year.desc}
             href={`/year/${year.id}`}
-            className="group relative bg-zinc-900 border border-zinc-800 rounded-3xl p-8 hover:border-blue-500/50 transition-all hover:shadow-2xl hover:shadow-blue-500/10"
-          >
-            <div className="mb-6 inline-flex p-4 bg-blue-500/10 rounded-2xl text-blue-500 group-hover:scale-110 transition-transform">
-              <Folder className="h-10 w-10" fill="currentColor" fillOpacity={0.2} />
-            </div>
-            <h3 className="text-2xl font-bold mb-2 group-hover:text-blue-500 transition-colors">{year.name}</h3>
-            <p className="text-zinc-500 text-sm mb-8">{year.desc}</p>
-
-            <div className="flex items-center text-zinc-400 font-bold group-hover:text-white transition-colors">
-              دخول
-              <ChevronLeft className="mr-2 h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-            </div>
-          </Link>
+          />
         ))}
+      </div>
+
+      {/* Subtle decorative background */}
+      <div className="fixed top-0 left-0 w-full h-full -z-50 overflow-hidden pointer-events-none opacity-20">
+         <div className="absolute top-[10%] right-[10%] w-[40rem] h-[40rem] bg-blue-600/10 rounded-full blur-[120px]" />
+         <div className="absolute bottom-[10%] left-[5%] w-[30rem] h-[30rem] bg-purple-600/10 rounded-full blur-[100px]" />
       </div>
     </div>
   );
