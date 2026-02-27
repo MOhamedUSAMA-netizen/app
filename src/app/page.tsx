@@ -1,8 +1,7 @@
 import { getSession } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Lock, Unlock, PlayCircle, FileText, GraduationCap, ChevronLeft, LogOut, Clock } from 'lucide-react';
+import { Folder, ChevronLeft, LogOut } from 'lucide-react';
 import { logoutAction } from '@/lib/actions';
 import RedeemCodeForm from '@/components/RedeemCodeForm';
 
@@ -18,28 +17,19 @@ export default async function StudentHome() {
   }
 
   const studentId = session.user.id;
-  const sessions = await prisma.session.findMany({
-    orderBy: { order: 'asc' },
-    include: {
-      accesses: {
-        where: { studentId },
-      },
-      quiz: {
-        include: {
-          submissions: {
-            where: { studentId },
-          }
-        }
-      }
-    },
-  });
+
+  const years = [
+    { id: '1', name: 'الصف الأول الثانوي', desc: 'محاضرات ومذكرات السنة الأولى' },
+    { id: '2', name: 'الصف الثاني الثانوي', desc: 'محاضرات ومذكرات السنة الثانية' },
+    { id: '3', name: 'الصف الثالث الثانوي', desc: 'محاضرات ومذكرات السنة الثالثة' },
+  ];
 
   return (
     <div className="min-h-screen bg-black text-white px-4 py-6 md:px-12" dir="rtl">
       <header className="flex justify-between items-center mb-8 md:mb-12">
         <div>
           <h1 className="text-3xl font-bold">مرحباً، {session.user.name} 👋</h1>
-          <p className="text-zinc-500 mt-2">استكمل رحلتك التعليمية في الدراسات الاجتماعية</p>
+          <p className="text-zinc-500 mt-2">اختر السنة الدراسية للوصول إلى المحاضرات</p>
         </div>
         <form action={logoutAction}>
           <button className="p-2 text-zinc-500 hover:text-red-500 transition-colors">
@@ -50,110 +40,26 @@ export default async function StudentHome() {
 
       <RedeemCodeForm studentId={studentId} />
 
-      <div className="space-y-16">
-        {['1', '2', '3'].map((lvl) => {
-          const filteredSessions = sessions.filter(s => s.level === lvl);
-          if (filteredSessions.length === 0) return null;
-
-          return (
-            <div key={lvl} className="space-y-8">
-               <h2 className="text-2xl font-bold flex items-center gap-3">
-                  <div className="h-8 w-2 bg-blue-600 rounded-full"></div>
-                  {lvl === '1' ? 'الصف الأول الثانوي' : lvl === '2' ? 'الصف الثاني الثانوي' : 'الصف الثالث الثانوي'}
-               </h2>
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {filteredSessions.map((item, index) => {
-          const access = item.accesses[0];
-          // Check for expiration
-          let isLocked = access ? access.isLocked : true;
-          if (access?.expiresAt && new Date() > access.expiresAt) {
-            isLocked = true;
-          }
-          const isCompleted = (item.quiz?.submissions?.length ?? 0) > 0;
-
-                    return (
-            <div
-              key={item.id}
-              className={`relative rounded-2xl border transition-all duration-300 ${
-                isLocked
-                ? 'bg-zinc-900/50 border-zinc-800 grayscale opacity-80'
-                : 'bg-zinc-900 border-zinc-800 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10'
-              }`}
-            >
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-6">
-                  <span className="text-xs font-bold text-blue-500 bg-blue-500/10 px-3 py-1 rounded-full uppercase tracking-wider">
-                    المحاضرة {index + 1}
-                  </span>
-                  {isLocked ? (
-                    <div className="p-2 bg-zinc-800 rounded-lg text-zinc-500">
-                      <Lock className="h-5 w-5" />
-                    </div>
-                  ) : (
-                    <div className="p-2 bg-green-500/10 rounded-lg text-green-500">
-                      <Unlock className="h-5 w-5" />
-                    </div>
-                  )}
-                </div>
-
-                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                {access?.expiresAt && !isLocked && (
-                  <div className="flex items-center gap-1 text-[10px] text-yellow-500 mb-2 font-bold">
-                    <Clock className="h-3 w-3" />
-                    <span>ينتهي في: {access.expiresAt.toLocaleString('ar-EG')}</span>
-                  </div>
-                )}
-                <p className="text-zinc-500 text-sm mb-6 line-clamp-2">{item.description}</p>
-
-                <div className="flex items-center gap-4 mb-8 text-zinc-400">
-                   <div className="flex items-center gap-1 text-xs">
-                      <PlayCircle className="h-4 w-4" />
-                      <span>فيديو</span>
-                   </div>
-                   <div className="flex items-center gap-1 text-xs">
-                      <FileText className="h-4 w-4" />
-                      <span>PDF</span>
-                   </div>
-                   <div className="flex items-center gap-1 text-xs">
-                      <GraduationCap className="h-4 w-4" />
-                      <span>اختبار</span>
-                   </div>
-                </div>
-
-                {isLocked ? (
-                  <button className="w-full py-3 rounded-xl bg-zinc-800 text-zinc-500 font-bold cursor-not-allowed">
-                    مغلق حالياً
-                  </button>
-                ) : (
-                  <Link
-                    href={`/sessions/${item.id}`}
-                    className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold flex items-center justify-center transition-colors group"
-                  >
-                    دخول المحاضرة
-                    <ChevronLeft className="mr-2 h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-                  </Link>
-                )}
-
-                {isCompleted && (
-                  <div className="absolute -top-2 -left-2 bg-green-500 text-white p-1 rounded-full shadow-lg">
-                    <GraduationCap className="h-4 w-4" />
-                  </div>
-                )}
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {years.map((year) => (
+          <Link
+            key={year.id}
+            href={`/year/${year.id}`}
+            className="group relative bg-zinc-900 border border-zinc-800 rounded-3xl p-8 hover:border-blue-500/50 transition-all hover:shadow-2xl hover:shadow-blue-500/10"
+          >
+            <div className="mb-6 inline-flex p-4 bg-blue-500/10 rounded-2xl text-blue-500 group-hover:scale-110 transition-transform">
+              <Folder className="h-10 w-10" fill="currentColor" fillOpacity={0.2} />
             </div>
-                    );
-                  })}
-               </div>
+            <h3 className="text-2xl font-bold mb-2 group-hover:text-blue-500 transition-colors">{year.name}</h3>
+            <p className="text-zinc-500 text-sm mb-8">{year.desc}</p>
+
+            <div className="flex items-center text-zinc-400 font-bold group-hover:text-white transition-colors">
+              دخول
+              <ChevronLeft className="mr-2 h-5 w-5 group-hover:-translate-x-1 transition-transform" />
             </div>
-          );
-        })}
+          </Link>
+        ))}
       </div>
-
-      {sessions.length === 0 && (
-        <div className="text-center py-20 bg-zinc-900 rounded-3xl border border-zinc-800">
-          <p className="text-zinc-500">لا توجد محاضرات متاحة لك حالياً. سيقوم المعلم بإضافتها قريباً.</p>
-        </div>
-      )}
     </div>
   );
 }
