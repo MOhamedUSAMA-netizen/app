@@ -76,6 +76,7 @@ export default function QuizPlayer({ quiz, studentId, sessionId }: { quiz: any, 
   }
 
   const q = questions[currentQuestion];
+  const slotLabels = ['أ', 'ب', 'ج', 'د'];
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
@@ -107,7 +108,12 @@ export default function QuizPlayer({ quiz, studentId, sessionId }: { quiz: any, 
                    : 'bg-zinc-800/50 border-zinc-700 text-zinc-400 hover:border-zinc-500'
                  }`}
                >
-                 <span className="text-lg">{option}</span>
+                 <div className="flex items-center gap-4">
+                    <span className="h-8 w-8 flex items-center justify-center rounded-full bg-zinc-800 border border-zinc-700 text-sm font-bold text-zinc-400">
+                       {slotLabels[i] || (i + 1)}
+                    </span>
+                    <span className="text-lg">{option}</span>
+                 </div>
                  {answers[currentQuestion] === i && <CheckCircle2 className="h-6 w-6 text-blue-500" />}
                </button>
             ))}

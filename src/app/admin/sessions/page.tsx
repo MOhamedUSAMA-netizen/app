@@ -7,11 +7,13 @@ async function createSession(formData: FormData) {
   'use server';
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
+  const level = formData.get('level') as string;
 
   await prisma.session.create({
     data: {
       title,
       description,
+      level,
       order: 0,
     },
   });
@@ -43,30 +45,48 @@ export default async function SessionsPage() {
 
       <div className="bg-zinc-900 p-6 rounded-xl border border-zinc-800">
         <h3 className="text-xl font-semibold mb-4">إضافة محاضرة جديدة</h3>
-        <form action={createSession} className="flex gap-4">
+        <form action={createSession} className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <input
             name="title"
             placeholder="عنوان المحاضرة"
             required
-            className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="md:col-span-2 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <input
-            name="description"
-            placeholder="وصف بسيط (اختياري)"
-            className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <select
+            name="level"
+            className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+             <option value="1">الصف الأول الثانوي</option>
+             <option value="2">الصف الثاني الثانوي</option>
+             <option value="3">الصف الثالث الثانوي</option>
+          </select>
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg font-semibold flex items-center transition-colors"
+            className="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-lg font-semibold flex items-center justify-center transition-colors"
           >
             <Plus className="ml-2 h-5 w-5" />
             إضافة
           </button>
+          <input
+            name="description"
+            placeholder="وصف بسيط (اختياري)"
+            className="md:col-span-4 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </form>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sessions.map((session) => (
+      <div className="space-y-12">
+        {['1', '2', '3'].map((lvl) => {
+          const filteredSessions = sessions.filter(s => s.level === lvl);
+          if (filteredSessions.length === 0) return null;
+
+          return (
+            <div key={lvl} className="space-y-6">
+              <h3 className="text-2xl font-bold border-r-4 border-blue-500 pr-4">
+                {lvl === '1' ? 'الصف الأول الثانوي' : lvl === '2' ? 'الصف الثاني الثانوي' : 'الصف الثالث الثانوي'}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredSessions.map((session) => (
           <div key={session.id} className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden hover:border-zinc-700 transition-all group">
             <div className="p-6">
               <h4 className="text-xl font-bold mb-2">{session.title}</h4>
@@ -99,7 +119,11 @@ export default async function SessionsPage() {
               </div>
             </div>
           </div>
-        ))}
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {sessions.length === 0 && (

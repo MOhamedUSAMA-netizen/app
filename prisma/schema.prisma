@@ -25,6 +25,7 @@ model Session {
   id          String   @id @default(cuid())
   title       String
   description String?
+  level       String   @default("1") // "1" for 1st year, "2" for 2nd, "3" for 3rd
   order       Int      @default(0)
   createdAt   DateTime @default(now())
 

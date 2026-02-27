@@ -75,12 +75,14 @@ export default async function StudentSessionDetail({ params }: { params: Promise
                    <Play className="h-5 w-5 text-blue-500" />
                    {video.name}
                 </h3>
-                <div className="aspect-video bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl relative group">
-                  <VideoWatermark studentName={session.user.name} studentEmail={session.user.email} />
+                <div className="aspect-video bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl relative group flex items-center justify-center">
+                  <div className="absolute inset-0 z-40 overflow-hidden pointer-events-none">
+                    <VideoWatermark studentName={session.user.name} studentEmail={session.user.email} />
+                  </div>
                   <video
                     src={video.url}
                     controls
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain relative z-10"
                     controlsList="nodownload"
                   >
                     متصفحك لا يدعم تشغيل الفيديو.
@@ -153,17 +155,18 @@ export default async function StudentSessionDetail({ params }: { params: Promise
                          const studentAnswer = JSON.parse(item.quiz?.submissions[0].answers || '[]')[idx];
                          const isCorrect = studentAnswer === q.correctAnswer;
                          const options = JSON.parse(q.options);
+                         const slotLabels = ['أ', 'ب', 'ج', 'د'];
 
                          return (
                             <div key={q.id} className="p-3 bg-zinc-800/50 rounded-lg text-xs space-y-2 border-r-2 border-zinc-700">
                                <p className="font-bold">{idx + 1}. {q.text}</p>
                                <div className="flex flex-col gap-1">
                                   <div className={`p-2 rounded ${isCorrect ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                                     إجابتك: {options[studentAnswer]}
+                                     إجابتك ({slotLabels[studentAnswer]}): {options[studentAnswer]}
                                   </div>
                                   {!isCorrect && (
                                      <div className="p-2 rounded bg-blue-500/10 text-blue-500">
-                                        الإجابة الصحيحة: {options[q.correctAnswer]}
+                                        الإجابة الصحيحة ({slotLabels[q.correctAnswer]}): {options[q.correctAnswer]}
                                      </div>
                                   )}
                                </div>

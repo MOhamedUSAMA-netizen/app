@@ -50,8 +50,19 @@ export default async function StudentHome() {
 
       <RedeemCodeForm studentId={studentId} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {sessions.map((item, index) => {
+      <div className="space-y-16">
+        {['1', '2', '3'].map((lvl) => {
+          const filteredSessions = sessions.filter(s => s.level === lvl);
+          if (filteredSessions.length === 0) return null;
+
+          return (
+            <div key={lvl} className="space-y-8">
+               <h2 className="text-2xl font-bold flex items-center gap-3">
+                  <div className="h-8 w-2 bg-blue-600 rounded-full"></div>
+                  {lvl === '1' ? 'الصف الأول الثانوي' : lvl === '2' ? 'الصف الثاني الثانوي' : 'الصف الثالث الثانوي'}
+               </h2>
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {filteredSessions.map((item, index) => {
           const access = item.accesses[0];
           // Check for expiration
           let isLocked = access ? access.isLocked : true;
@@ -60,7 +71,7 @@ export default async function StudentHome() {
           }
           const isCompleted = (item.quiz?.submissions?.length ?? 0) > 0;
 
-          return (
+                    return (
             <div
               key={item.id}
               className={`relative rounded-2xl border transition-all duration-300 ${
@@ -129,6 +140,10 @@ export default async function StudentHome() {
                   </div>
                 )}
               </div>
+            </div>
+                    );
+                  })}
+               </div>
             </div>
           );
         })}

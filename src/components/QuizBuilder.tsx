@@ -42,6 +42,7 @@ export default function QuizBuilder({ sessionId, initialQuiz }: { sessionId: str
     setQuestions(newQuestions);
   };
 
+  const slotLabels = ['أ', 'ب', 'ج', 'د'];
   const handleSave = async () => {
     setLoading(true);
     try {
@@ -77,9 +78,11 @@ export default function QuizBuilder({ sessionId, initialQuiz }: { sessionId: str
               <div key={oIndex} className="flex items-center gap-2">
                 <button
                   onClick={() => updateQuestion(qIndex, 'correctAnswer', oIndex)}
-                  className={`flex-shrink-0 ${q.correctAnswer === oIndex ? 'text-green-500' : 'text-zinc-500'}`}
+                  className={`flex-shrink-0 font-bold ${q.correctAnswer === oIndex ? 'text-green-500' : 'text-zinc-500'}`}
                 >
-                  {q.correctAnswer === oIndex ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
+                  <span className={`h-8 w-8 flex items-center justify-center rounded-full border ${q.correctAnswer === oIndex ? 'bg-green-500/10 border-green-500' : 'bg-zinc-800 border-zinc-700'}`}>
+                    {slotLabels[oIndex] || (oIndex + 1)}
+                  </span>
                 </button>
                 <input
                   placeholder={`الاختيار ${oIndex + 1}`}
