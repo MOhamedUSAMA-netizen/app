@@ -22,7 +22,7 @@ export default function RegisterPage() {
       if (result?.error) {
         setError(result.error);
       } else {
-        router.push('/');
+        router.push('/dashboard');
         router.refresh();
       }
     } catch (err) {

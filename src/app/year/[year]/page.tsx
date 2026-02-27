@@ -38,7 +38,7 @@ export default async function StudentYearSessionsPage({ params }: { params: Prom
   return (
     <div className="min-h-screen text-white px-4 py-12 md:px-16" dir="rtl">
       <header className="flex items-center gap-6 mb-16">
-        <Link href="/" className="p-3 glass rounded-2xl hover:bg-blue-600/20 transition-all hover:scale-110">
+        <Link href="/dashboard" className="p-3 glass rounded-2xl hover:bg-blue-600/20 transition-all hover:scale-110">
           <ArrowRight className="h-6 w-6" />
         </Link>
         <div>

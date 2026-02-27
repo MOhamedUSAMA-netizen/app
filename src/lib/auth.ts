@@ -2,6 +2,13 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === "production") {
+  // During build, Next.js might not have the env vars.
+  // We only want to block actual runtime if it's missing.
+  // However, Next.js build often needs these for static generation of protected routes.
+  console.warn("Warning: JWT_SECRET environment variable is not set");
+}
+
 const secretKey = process.env.JWT_SECRET || "fallback-secret-for-dev-only";
 const key = new TextEncoder().encode(secretKey);
 

@@ -5,6 +5,8 @@ export async function middleware(request: NextRequest) {
   const session = request.cookies.get('session')?.value;
   const path = request.nextUrl.pathname;
 
+  if (path === '/') return NextResponse.next();
+
   let decodedSession = null;
   if (session) {
     try {
@@ -16,7 +18,7 @@ export async function middleware(request: NextRequest) {
 
   if (path === '/login' || path === '/register') {
     if (decodedSession) {
-      return NextResponse.redirect(new URL('/', request.url));
+      return NextResponse.redirect(new URL('/dashboard', request.url));
     }
     return NextResponse.next();
   }

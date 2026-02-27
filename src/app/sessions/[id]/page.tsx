@@ -57,7 +57,7 @@ export default async function StudentSessionDetail({ params }: { params: Promise
       <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-zinc-800 p-4 px-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <Link href="/" className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
+            <Link href="/dashboard" className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
               <ArrowRight className="h-6 w-6" />
             </Link>
             <h1 className="text-xl font-bold">{item.title}</h1>

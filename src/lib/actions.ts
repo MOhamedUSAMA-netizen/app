@@ -129,7 +129,7 @@ export async function addMediaAction(sessionId: string, formData: FormData) {
   });
 
   revalidatePath(`/admin/sessions/${sessionId}`);
-  revalidatePath('/');
+  revalidatePath('/dashboard');
 }
 
 export async function deleteMediaAction(mediaId: string, sessionId: string) {
@@ -234,6 +234,6 @@ export async function redeemCodeAction(studentId: string, code: string) {
     }
   });
 
-  revalidatePath('/');
+  revalidatePath('/dashboard');
   return { success: true };
 }
