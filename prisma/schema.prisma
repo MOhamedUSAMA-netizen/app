@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("STUDENT") // "TEACHER" or "STUDENT"
+  createdAt DateTime @default(now())
+
+  accesses    StudentAccess[]
+  submissions Submission[]
+  engagements VideoEngagement[]
+  usedCodes   AccessCode[]
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  level       String   @default("1") // "1" for 1st year, "2" for 2nd, "3" for 3rd
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  quiz        Quiz?
+  media       Media[]
+  accesses    StudentAccess[]
+  accessCodes AccessCode[]
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  type      String   // "VIDEO" or "PDF"
+  url       String
+  name      String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model AccessCode {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  sessionId   String
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  durationHrs Int      // Duration in hours
+  isUsed      Boolean  @default(false)
+  usedById    String?
+  usedBy      User?    @relation(fields: [usedById], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  usedAt      DateTime?
+}
+
+model Quiz {
+  id        String   @id @default(cuid())
+  title     String
+  sessionId String   @unique
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  questions Question[]
+  submissions Submission[]
+}
+
+model Question {
+  id            String @id @default(cuid())
+  quizId        String
+  quiz          Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  text          String
+  options       String // Store as JSON string
+  correctAnswer Int    // Index of correct option
+}
+
+model StudentAccess {
+  id        String   @id @default(cuid())
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  isLocked  Boolean  @default(true)
+  expiresAt DateTime?
+
+  @@unique([studentId, sessionId])
+}
+
+model Submission {
+  id        String   @id @default(cuid())
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  quizId    String
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  score     Int
+  total     Int
+  answers   String   // Store student answers as JSON string
+  createdAt DateTime @default(now())
+}
+
+model VideoEngagement {
+  id        String   @id @default(cuid())
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  sessionId String
+  watched   Int      @default(0) // Seconds or percentage
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, sessionId])
+}
